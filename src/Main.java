@@ -176,17 +176,17 @@ public class Main {
             }
             else
             {
-                byteArr = new byte[iter.fin - iter.inicio];
+                byteArr = new byte[iter.fin - iter.inicio + 1];
             }
-            for (int i = 0; i<byteArr.length; i++)
+            for (int i = 0; i < byteArr.length; i++)
             {
                 byteArr[i] = imagen[i+iter.inicio];
             }
 
             mensaje = mensaje + byteArrayToString(byteArr);
         }
+        
         return mensaje;
-
     }
 
 
