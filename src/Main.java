@@ -1,17 +1,48 @@
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
-import java.io.*;
-import java.net.*;
-import java.nio.Buffer;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.LinkedList;
 
+/*
+Clase que implementé para poder guardar inicio y fin en cada entrada en el vector, algo así como un struct
+ */
+
+final class IndexesInImage {
+    public int inicio;    // Donde empieza a mapear el pedazo del mensaje
+    public int fin;    // Donde termina de mapear el pedazo del mensaje
+    public boolean valido;
+
+    public IndexesInImage(int inicio, int fin, boolean valor) {
+        this.inicio = inicio;
+        this.fin = fin;
+        this.valido = valor;
+    }
+    public IndexesInImage(boolean valor) {
+        this.valido = valor;
+    }
+}
+
 public class Main {
+    static LinkedList<IndexesInImage> vector = new LinkedList<IndexesInImage>();
     // ALT+SHIFT+F10, Right, E, Enter, Tab  : para poner comandos en el main en IntelliJ
     public static void main(String[] args) {
         byte [] bytes = urlToFinalByteArray("https://images-na.ssl-images-amazon.com/images/I/31e9Y7Ob5wL._SY300_.jpg");
+
+        //IMAGEN NICHOLAS CAGE
+        //byte [] bytes = urlToFinalByteArray("https://i.kinja-img.com/gawker-media/image/upload/s--2wKOFE_v--/c_scale,fl_progressive,q_80,w_800/iwpzjy3ggdpapoagr8av.jpg");
+
+        //Imprime cada byte
+        /*for (int i = 0; i<270117; i++)
+        {
+            System.out.println(bytes[i]);
+        }*/
+
         System.out.println(bytes.length);
     }
 
@@ -72,4 +103,55 @@ public class Main {
         }
         return finalByteArray;
     }
+
+    //Text to byte array--------------------------------------------------------------------------------------
+
+
+    public static byte[] stringToByteArray(String str) {
+        byte[] byteArr = str.getBytes(StandardCharsets.UTF_8);
+
+        return byteArr;
+    }
+
+    public static String byteArrayToString(byte[] byteArr) {
+        String str = new String(byteArr, StandardCharsets.UTF_8);
+
+        return str;
+    }
+
+    public static IndexesInImage findSubSequence(byte[] outerArray, byte[] smallerArray) { //Encuentra los indices en la imagen
+        int storeJValue=0;
+        for(int i = 0; i < outerArray.length - smallerArray.length+1; ++i) {
+            boolean found = true;
+            for(int j = 0; j < smallerArray.length; ++j) {
+                if (outerArray[i+j] != smallerArray[j]) {
+                    found = false;
+                    break;
+                }
+                storeJValue = j;
+            }
+            if (found) return new IndexesInImage(i, i+storeJValue, true); //Si si encuentra la subcadena devuelve los indices y que es valido
+        }
+        return new IndexesInImage(false); // Si no la encuentra devuelve que no es valido
+    }
+
+
+    public static void creaVector(byte[] mensaje, byte[] imagen) {
+
+        IndexesInImage indexes = findSubSequence(imagen, mensaje);
+
+        if (indexes.valido == true)
+        {
+            vector.add(indexes); //vector tiene que ser global porque es recursvio el algoritmo
+        }
+        else
+        {
+            //divide el mensaje en dos
+            creaVector(Arrays.copyOfRange(mensaje,0, (mensaje.length)/2), imagen);
+            creaVector(Arrays.copyOfRange(mensaje, (mensaje.length)/2, mensaje.length), imagen);
+        }
+
+    }
+
+
 }
