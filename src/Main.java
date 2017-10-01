@@ -78,9 +78,10 @@ public class Main {
     // devuelve una lista con los bytes que faltan en el byteArray
     public static LinkedList getMissingBytes(byte[] byteArray) {
         LinkedList<Byte> missingByteList = new LinkedList<Byte>();
-        for (byte b = 0; b < Byte.MAX_VALUE; b++) {
+        for (byte b = Byte.MIN_VALUE; b < Byte.MAX_VALUE; b++) {
             missingByteList.add(b);
         }
+        missingByteList.add((byte) 127);
         for (int i = 0; i < byteArray.length; i++) {
             //quita los bytes del array de la lista (porque no hacen falta)
             if (missingByteList.contains((Byte) byteArray[i])) {
