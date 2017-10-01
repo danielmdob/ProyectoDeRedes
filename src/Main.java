@@ -13,7 +13,7 @@ import java.util.LinkedList;
 Clase que implementé para poder guardar inicio y fin en cada entrada en el vector, algo así como un struct
  */
 
-final class IndexesInImage {
+class IndexesInImage {
     public int inicio;    // Donde empieza a mapear el pedazo del mensaje
     public int fin;    // Donde termina de mapear el pedazo del mensaje
     public boolean valido;
@@ -32,7 +32,13 @@ public class Main {
     static LinkedList<IndexesInImage> vector = new LinkedList<IndexesInImage>();
     // ALT+SHIFT+F10, Right, E, Enter, Tab  : para poner comandos en el main en IntelliJ
     public static void main(String[] args) {
-        byte [] bytes = urlToFinalByteArray("https://images-na.ssl-images-amazon.com/images/I/31e9Y7Ob5wL._SY300_.jpg");
+        byte [] image = urlToFinalByteArray("https://images-na.ssl-images-amazon.com/images/I/31e9Y7Ob5wL._SY300_.jpg");
+        String msg = "Esto es una prueba...";
+        byte [] message = stringToByteArray(msg);
+        createVector(message, image);
+
+        System.out.println(interpretVector(vector, image));
+
 
         //IMAGEN NICHOLAS CAGE
         //byte [] bytes = urlToFinalByteArray("https://i.kinja-img.com/gawker-media/image/upload/s--2wKOFE_v--/c_scale,fl_progressive,q_80,w_800/iwpzjy3ggdpapoagr8av.jpg");
@@ -43,7 +49,7 @@ public class Main {
             System.out.println(bytes[i]);
         }*/
 
-        System.out.println(bytes.length);
+
     }
 
     public static byte[] urlToFinalByteArray(String url){
@@ -131,28 +137,60 @@ public class Main {
                 }
                 storeJValue = j;
             }
-            if (found) return new IndexesInImage(i, i+storeJValue, true); //Si si encuentra la subcadena devuelve los indices y que es valido
+            if (found) { //Si si encuentra la subcadena devuelve los indices y que es valido
+                //System.out.println("found");
+                return new IndexesInImage(i, i+storeJValue, true);
+
+
+            }
         }
         return new IndexesInImage(false); // Si no la encuentra devuelve que no es valido
     }
 
 
-    public static void creaVector(byte[] mensaje, byte[] imagen) {
+    public static void createVector(byte[] mensaje, byte[] imagen) {
+        //System.out.println("Entro Recursivamente");
 
         IndexesInImage indexes = findSubSequence(imagen, mensaje);
 
-        if (indexes.valido == true)
-        {
+        if (indexes.valido == true) {
             vector.add(indexes); //vector tiene que ser global porque es recursvio el algoritmo
         }
         else
         {
             //divide el mensaje en dos
-            creaVector(Arrays.copyOfRange(mensaje,0, (mensaje.length)/2), imagen);
-            creaVector(Arrays.copyOfRange(mensaje, (mensaje.length)/2, mensaje.length), imagen);
+            createVector(Arrays.copyOfRange(mensaje,0, (mensaje.length)/2), imagen);
+            createVector(Arrays.copyOfRange(mensaje, (mensaje.length)/2, mensaje.length), imagen);
         }
 
     }
+
+    public static String interpretVector (LinkedList<IndexesInImage> vector, byte[] imagen)
+    {
+        String mensaje = "";
+        byte[] byteArr;
+        for (IndexesInImage iter : vector) {
+            //System.out.println(iter.inicio +  " -- " + iter.fin);
+            if (iter.inicio == iter.fin) {
+                byteArr = new byte[1];
+            }
+            else
+            {
+                byteArr = new byte[iter.fin - iter.inicio];
+            }
+            for (int i = 0; i<byteArr.length; i++)
+            {
+                byteArr[i] = imagen[i+iter.inicio];
+            }
+
+            mensaje = mensaje + byteArrayToString(byteArr);
+        }
+        return mensaje;
+
+    }
+
+
+
 
 
 }
