@@ -3,6 +3,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -13,7 +14,7 @@ import java.util.LinkedList;
 Clase que implementé para poder guardar inicio y fin en cada entrada en el vector, algo así como un struct
  */
 
-class IndexesInImage {
+class IndexesInImage implements Serializable {  // puse esto de serializable para que se pueda pasar a archivo
     public int inicio;    // Donde empieza a mapear el pedazo del mensaje
     public int fin;    // Donde termina de mapear el pedazo del mensaje
     public boolean valido;
@@ -32,11 +33,12 @@ public class Main {
     static LinkedList<IndexesInImage> vector = new LinkedList<IndexesInImage>();
     // ALT+SHIFT+F10, Right, E, Enter, Tab  : para poner comandos en el main en IntelliJ
     public static void main(String[] args) {
-        byte [] image = urlToFinalByteArray("https://images-na.ssl-images-amazon.com/images/I/31e9Y7Ob5wL._SY300_.jpg");
-        String msg = "Esto es una prueba...";
+        byte [] image = urlToFinalByteArray("https://i.kinja-img.com/gawker-media/image/upload/s--2wKOFE_v--/c_scale,fl_progressive,q_80,w_800/iwpzjy3ggdpapoagr8av.jpg");
+        String msg = "Esto es un mensaje";
         byte [] message = stringToByteArray(msg);
-        createVector(message, image);
-
+        Vector vector = new Vector(message, image);
+        vector.createFile("Vector.vec");
+        //Vector vector = Vector.loadFromFile("Vector.vec");
         System.out.println(interpretVector(vector, image));
 
 
@@ -126,50 +128,12 @@ public class Main {
         return str;
     }
 
-    public static IndexesInImage findSubSequence(byte[] outerArray, byte[] smallerArray) { //Encuentra los indices en la imagen
-        int storeJValue=0;
-        for(int i = 0; i < outerArray.length - smallerArray.length+1; ++i) {
-            boolean found = true;
-            for(int j = 0; j < smallerArray.length; ++j) {
-                if (outerArray[i+j] != smallerArray[j]) {
-                    found = false;
-                    break;
-                }
-                storeJValue = j;
-            }
-            if (found) { //Si si encuentra la subcadena devuelve los indices y que es valido
-                //System.out.println("found");
-                return new IndexesInImage(i, i+storeJValue, true);
-
-
-            }
-        }
-        return new IndexesInImage(false); // Si no la encuentra devuelve que no es valido
-    }
-
-
-    public static void createVector(byte[] mensaje, byte[] imagen) {
-        //System.out.println("Entro Recursivamente");
-
-        IndexesInImage indexes = findSubSequence(imagen, mensaje);
-
-        if (indexes.valido == true) {
-            vector.add(indexes); //vector tiene que ser global porque es recursvio el algoritmo
-        }
-        else
-        {
-            //divide el mensaje en dos
-            createVector(Arrays.copyOfRange(mensaje,0, (mensaje.length)/2), imagen);
-            createVector(Arrays.copyOfRange(mensaje, (mensaje.length)/2, mensaje.length), imagen);
-        }
-
-    }
-
-    public static String interpretVector (LinkedList<IndexesInImage> vector, byte[] imagen)
+    public static String interpretVector (Vector vector, byte[] imagen)
     {
+        LinkedList<IndexesInImage> indexesList = vector.getVector();
         String mensaje = "";
         byte[] byteArr;
-        for (IndexesInImage iter : vector) {
+        for (IndexesInImage iter : indexesList) {
             //System.out.println(iter.inicio +  " -- " + iter.fin);
             if (iter.inicio == iter.fin) {
                 byteArr = new byte[1];
@@ -185,7 +149,7 @@ public class Main {
 
             mensaje = mensaje + byteArrayToString(byteArr);
         }
-        
+
         return mensaje;
     }
 
