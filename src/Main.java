@@ -2,12 +2,12 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.LinkedList;
 
 /*
@@ -37,9 +37,26 @@ public class Main {
         String msg = "Esto es un mensaje";
         byte [] message = stringToByteArray(msg);
         Vector vector = new Vector(message, image);
-        vector.createFile("Vector.vec");
-        //Vector vector = Vector.loadFromFile("Vector.vec");
-        System.out.println(interpretVector(vector, image));
+        vector.createFile("VectorOriginal.txt");
+
+
+
+        //Cifrar y descifrar
+        String key = "RedesDeComputado"; //Debe ser de 16 bytes la llave
+        File inputFile = new File("VectorOriginal.txt");
+        File encryptedFile = new File("VectorEncriptado.txt");
+        File decryptedFile = new File("VectorDesencriptado.txt");
+
+        try {
+            Crypto.encrypt(key, inputFile, encryptedFile); //Encripta
+            Crypto.decrypt(key, encryptedFile, decryptedFile);//Desencripta
+        } catch (CryptoException ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+        //Abrir el descifrado
+        Vector vector2 = Vector.loadFromFile("VectorDesencriptado.txt");
+        System.out.println(interpretVector(vector2, image));
 
 
         //IMAGEN NICHOLAS CAGE
