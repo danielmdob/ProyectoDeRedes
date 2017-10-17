@@ -34,21 +34,21 @@ public class Main {
     // ALT+SHIFT+F10, Right, E, Enter, Tab  : para poner comandos en el main en IntelliJ
     public static void main(String[] args) {
         byte [] image = urlToFinalByteArray("https://i.kinja-img.com/gawker-media/image/upload/s--2wKOFE_v--/c_scale,fl_progressive,q_80,w_800/iwpzjy3ggdpapoagr8av.jpg");
-        String msg = "Esto es un mensaje";
-        byte [] message = stringToByteArray(msg);
-        Vector vector = new Vector(message, image);
-        vector.createFile("VectorOriginal.txt");
-
-
-
-        //Cifrar y descifrar
+//        String msg = "Esto es un mensaje";
+//        byte [] message = stringToByteArray(msg);
+//        Vector vector = new Vector(message, image);
+//        vector.createFile("VectorOriginal.txt");
+//
+//
+//
+//        //Cifrar y descifrar
         String key = "RedesDeComputado"; //Debe ser de 16 bytes la llave
-        File inputFile = new File("VectorOriginal.txt");
+//        File inputFile = new File("VectorOriginal.txt");
         File encryptedFile = new File("VectorEncriptado.txt");
         File decryptedFile = new File("VectorDesencriptado.txt");
 
         try {
-            Crypto.encrypt(key, inputFile, encryptedFile); //Encripta
+ //           Crypto.encrypt(key, inputFile, encryptedFile); //Encripta
             Crypto.decrypt(key, encryptedFile, decryptedFile);//Desencripta
         } catch (CryptoException ex) {
             System.out.println(ex.getMessage());
@@ -169,9 +169,5 @@ public class Main {
 
         return mensaje;
     }
-
-
-
-
 
 }
