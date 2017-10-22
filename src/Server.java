@@ -12,6 +12,8 @@ public class Server {
         String decryptedFileName = "desencriptado1";
         String url = args[0];
         String key = args[1]; //Debe ser de 16 bytes la llave
+        System.out.println(args.length);
+        String host = (args.length == 2) ? "127.0.0.1" : args[2]; //si no especifica ip, usa localhost
         byte [] image = CommonMethods.urlToFinalByteArray(url);
         ServerSocket serverSocket = null;
 

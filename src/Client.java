@@ -10,10 +10,10 @@ public class Client {
     // ALT+SHIFT+F10, Right, E, Enter, Tab  : para poner comandos en el main en IntelliJ
     public static void main(String[] args) throws IOException {
         Socket socket = null;
-        String host = "127.0.0.1";
         String message = args[0];
         String url = args[1];
         String key = args[2];
+        String host = (args.length == 3) ? "127.0.0.1" : args[3]; //si no especifica ip, usa localhost
 
         byte[] image = CommonMethods.urlToFinalByteArray(url);
         Vector sentVector = new Vector(CommonMethods.stringToByteArray(message), image);
